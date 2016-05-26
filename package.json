@@ -1,0 +1,33 @@
+{
+  "name": "ng2-webpack-balsa",
+  "version": "0.0.1",
+  "description": "An Angular 2 & Webpack generator for Balsa",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gonzofish/ng2-webpack-balsa.git"
+  },
+  "keywords": [
+    "Angular",
+    "Angular",
+    "2",
+    "Webpack",
+    "ng2",
+    "ng",
+    "balsa",
+    "generator",
+    "scaffolding"
+  ],
+  "author": "Matt Fehskens <matt.fehskens@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gonzofish/ng2-webpack-balsa/issues"
+  },
+  "homepage": "https://github.com/gonzofish/ng2-webpack-balsa#readme",
+  "dependencies": {
+    "balsa": "git+https://github.com/gonzofish/balsa.git"
+  }
+}
