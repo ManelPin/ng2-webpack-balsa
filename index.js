@@ -30,6 +30,10 @@ const getCommand = (command, rootDir) => {
         case 'i':
             commandFunction = require(path.resolve(libsDir, 'initial'));
             break;
+        case 'service':
+        case 's':
+            commandFunction = require(path.resolve(libsDir, 'service'));
+            break;
     }
 
     return commandFunction;
