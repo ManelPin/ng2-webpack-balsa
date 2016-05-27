@@ -8,7 +8,7 @@ module.exports = (rootDir, selector) => {
     const files = getFiles(rootDir);
 
     if (!selector || selector.length === 0) {
-        balsa.ask(getQuestions(), files);
+        balsa.ask(getAllQuestions(), files);
     } else {
         askWithKnownSelector(selector, files);
     }
@@ -19,16 +19,13 @@ const getFiles = rootDir => {
 };
 
 const askWithKnownSelector = (selector, files) => {
-    const lifecycleHookQuestions = getLifecycleHookQuestions();
+    const additionalOptionsQuestions = getAdditionalOptionsQuestions();
 
-    ask(lifecycleHookQuestions, answers => {
+    ask(additionalOptionsQuestions, answers => {
         balsa.process([
             { name: 'selector', answer: selector },
-            { name: 'componentName', answer: dashToCap(selector) },
-            { name: 'lifecycleHooks', answer: answers[0].answer },
-            { name: 'lifecycleImplements', answer: answers[1].answer },
-            { name: 'lifecycleMethods', answer: answers[2].answer }
-        ], files);
+            { name: 'componentName', answer: dashToCap(selector) }
+        ].concat(answers), files);
     });
 }
 
@@ -37,9 +34,15 @@ const getAppFiles = rootDir => {
 
     return [
         { destination: path.resolve(appDir, '{{ selector }}.component.ts'), template: getTemplate('app', rootDir) },
-        { destination: path.resolve(appDir, '{{ selector }}.component.html') },
+        { check: checkCreateTemplateFile, destination: path.resolve(appDir, '{{ selector }}.component.html') },
         { destination: path.resolve(appDir, '{{ selector }}.component.scss') }
     ]
+};
+
+const checkCreateTemplateFile = answers => {
+    const templateAnswer = answers.find(answer => answer.name === 'template');
+
+    return templateAnswer.answer !== '``';
 };
 
 const getTestFiles = rootDir => {
@@ -59,7 +62,49 @@ const getAllQuestions = () => {
     return [
         { name: 'selector', question: 'Selector:' },
         { name: 'componentName', useAnswer: 'selector', transform: dashToCap}
+    ].concat(getAdditionalOptionsQuestions());
+};
+
+const getAdditionalOptionsQuestions = () => {
+    return [
+        { allowBlank: true, name: 'inlineStyles', question: 'Use inline styles (y/n)?', transform: createYesNo(setInlineStyles) },
+        { allowBlank: true, name: 'template', question: 'Use an inline template (y/n)?', transform: createYesNo(setTemplate) }
     ].concat(getLifecycleHookQuestions());
+};
+
+const createYesNo = method => {
+    return (value, allAnswers) => {
+        const isString = typeof value === 'string';
+        const yesNoLookup = {
+            n: false,
+            y: true
+        };
+
+        if (isString && value.length > 0) {
+            value = value[0].toLowerCase();
+        }
+
+        value = yesNoLookup[value];
+        if (value !== undefined) {
+            value = method(value, allAnswers);
+        } else {
+            value = null;
+        }
+
+        return value;
+    };
+};
+
+const setInlineStyles = (value, allAnswers) => {
+    const selector = allAnswers.find(answer => answer.name === 'selector');
+
+    return value ? `,\n\tstyles: [require('./${ selector.answer }.component.scss')]` : '';
+};
+
+const setTemplate = (value, allAnswers) => {
+    const selector = allAnswers.find(answer => answer.name === 'selector');
+
+    return value ? `\`\`` : `require('./${ selector.answer }.component.html')`;
 };
 
 const getLifecycleHookQuestions = () => {
