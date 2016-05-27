@@ -3,7 +3,8 @@ import {
 } from '@angular/core';
 
 @Component({
-    selector: '{{ selector }}'{{ inlineStyles }},
+    selector: '{{ selector }}',
+    styles: [{{ styles }}],
     template: {{ template }}
 })
 export class {{ componentName }}Component{{ lifecycleImplements }} {{{ lifecycleMethods }}}

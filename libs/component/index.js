@@ -4,10 +4,12 @@ const ask = require('balsa/libs/ask');
 const balsa = require('balsa');
 const path = require('path');
 
+const utils = require('../utilities');
+
 module.exports = (rootDir, selector) => {
     const files = getFiles(rootDir);
 
-    if (!selector || selector.length === 0) {
+    if (!utils.checkIsDashFormat(selector)) {
         balsa.ask(getAllQuestions(), files);
     } else {
         askWithKnownSelector(selector, files);
@@ -19,13 +21,14 @@ const getFiles = rootDir => {
 };
 
 const askWithKnownSelector = (selector, files) => {
-    const additionalOptionsQuestions = getAdditionalOptionsQuestions();
+    const basicAnswers = [
+        { name: 'selector', answer: selector },
+        { name: 'componentName', answer: utils.dashToCap(selector) }
+    ];
+    const additionalOptionsQuestions = getAdditionalOptionsQuestions(basicAnswers);
 
     ask(additionalOptionsQuestions, answers => {
-        balsa.process([
-            { name: 'selector', answer: selector },
-            { name: 'componentName', answer: dashToCap(selector) }
-        ].concat(answers), files);
+        balsa.process(basicAnswers.concat(answers), files);
     });
 }
 
@@ -34,15 +37,18 @@ const getAppFiles = rootDir => {
 
     return [
         { destination: path.resolve(appDir, '{{ selector }}.component.ts'), template: getTemplate('app', rootDir) },
-        { check: checkCreateTemplateFile, destination: path.resolve(appDir, '{{ selector }}.component.html') },
-        { destination: path.resolve(appDir, '{{ selector }}.component.scss') }
+        { check: checkCreateStyleFile, destination: path.resolve(appDir, '{{ selector }}.component.scss') },
+        { check: checkCreateTemplateFile, destination: path.resolve(appDir, '{{ selector }}.component.html') }
     ]
 };
 
-const checkCreateTemplateFile = answers => {
-    const templateAnswer = answers.find(answer => answer.name === 'template');
+const checkCreateStyleFile = answers => checkCreateFile('styles', answers);
+const checkCreateTemplateFile = answers => checkCreateFile('template', answers);
 
-    return templateAnswer.answer !== '``';
+const checkCreateFile = (fileType, answers) => {
+    const createFileAnswer = answers.find(answer => answer.name === fileType);
+
+    return createFileAnswer && createFileAnswer.answer !== '``';
 };
 
 const getTestFiles = rootDir => {
@@ -60,45 +66,22 @@ const getTemplate = (type, rootDir) => {
 
 const getAllQuestions = () => {
     return [
-        { name: 'selector', question: 'Selector:' },
-        { name: 'componentName', useAnswer: 'selector', transform: dashToCap}
+        { name: 'selector', question: 'Selector:', transform: utils.checkIsDashFormat },
+        { name: 'componentName', useAnswer: 'selector', transform: utils.dashToCap}
     ].concat(getAdditionalOptionsQuestions());
 };
 
-const getAdditionalOptionsQuestions = () => {
+const getAdditionalOptionsQuestions = (basicAnswers) => {
     return [
-        { allowBlank: true, name: 'inlineStyles', question: 'Use inline styles (y/n)?', transform: createYesNo(setInlineStyles) },
-        { allowBlank: true, name: 'template', question: 'Use an inline template (y/n)?', transform: createYesNo(setTemplate) }
-    ].concat(getLifecycleHookQuestions());
-};
-
-const createYesNo = method => {
-    return (value, allAnswers) => {
-        const isString = typeof value === 'string';
-        const yesNoLookup = {
-            n: false,
-            y: true
-        };
-
-        if (isString && value.length > 0) {
-            value = value[0].toLowerCase();
-        }
-
-        value = yesNoLookup[value];
-        if (value !== undefined) {
-            value = method(value, allAnswers);
-        } else {
-            value = null;
-        }
-
-        return value;
-    };
+        { allowBlank: true, name: 'styles', question: 'Use inline styles (y/n)?', transform: utils.createYesNo(setInlineStyles, basicAnswers) },
+        { allowBlank: true, name: 'template', question: 'Use an inline template (y/n)?', transform: utils.createYesNo(setTemplate, basicAnswers) }
+    ].concat(getLifecycleHookQuestions(basicAnswers));
 };
 
 const setInlineStyles = (value, allAnswers) => {
     const selector = allAnswers.find(answer => answer.name === 'selector');
 
-    return value ? `,\n\tstyles: [require('./${ selector.answer }.component.scss')]` : '';
+    return value ? `\`\`` : `require('./${ selector.answer }.component.scss')`;
 };
 
 const setTemplate = (value, allAnswers) => {
@@ -152,10 +135,6 @@ const checkIsValidHook = hook => {
     };
 
     return realHook;
-};
-
-const dashToCap = value => {
-    return value[0].toUpperCase() + value.slice(1).replace(/(\-.)/g, match => match.replace('-', '').toUpperCase());
 };
 
 const setLifecycleImplements = value => {
