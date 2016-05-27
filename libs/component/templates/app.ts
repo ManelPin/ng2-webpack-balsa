@@ -1,5 +1,5 @@
 import {
-    Component
+    Component{{ lifecycleHooks }}
 } from '@angular/core';
 
 @Component({
@@ -7,5 +7,4 @@ import {
     styles: [require('./{{ selector }}.component.scss')],
     template: require('./{{ selector }}.component.html')
 })
-export class {{ componentName }}Component {
-}
+export class {{ componentName }}Component{{ lifecycleImplements }} {{{ lifecycleMethods }}}
