@@ -6,13 +6,13 @@ const path = require('path');
 
 const utils = require('../utilities');
 
-module.exports = (rootDir, selector) => {
+module.exports = (rootDir, selector, callback) => {
     const files = getFiles(rootDir);
 
     if (!utils.checkIsDashFormat(selector)) {
-        balsa.ask(getAllQuestions(), files);
+        balsa.ask(getAllQuestions(), files, callback);
     } else {
-        askWithKnownSelector(selector, files);
+        askWithKnownSelector(selector, files, callback);
     }
 };
 
@@ -20,7 +20,7 @@ const getFiles = rootDir => {
     return getAppFiles(rootDir).concat(getTestFiles(rootDir));
 };
 
-const askWithKnownSelector = (selector, files) => {
+const askWithKnownSelector = (selector, files, callback) => {
     const basicAnswers = [
         { name: 'selector', answer: selector },
         { name: 'componentName', answer: utils.dashToCap(selector) }
@@ -29,6 +29,7 @@ const askWithKnownSelector = (selector, files) => {
 
     ask(additionalOptionsQuestions, answers => {
         balsa.process(basicAnswers.concat(answers), files);
+        callback(answers);
     });
 }
 

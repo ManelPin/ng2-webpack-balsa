@@ -87,6 +87,27 @@ create:
 - `package.json`
 - `.git`
 
+### Route <a name="route"></a>
+
+#### Prompts
+
+If the route's component selector is not passed as an argument to the command, you will
+be asked the same questions as the [component command](#component). Answer these questions
+for the new route component. After that, the only question is:
+
+- `What is the parent component?` - the selector of place to route from
+
+#### Output
+This produce the same output as the [component command](#component) for the route
+component.
+
+It will also modify the parent component to use routes. This adds
+
+- `ROUTER_DIRECTIVES` & `ROUTER_PROVIDERS` to the `@Component` decorator
+- Ensures that `Routes`, `ROUTER_DIRECTIVES`, and `ROUTER_PROVIDERS` are all imported from
+`@angular/router` (run `npm i -S @angular/router` if you haven't already)
+- Creates the `@Routes` decorator and adds the new route (if necessary)
+
 ### Service <a name="service"></a>
 
 #### Prompts

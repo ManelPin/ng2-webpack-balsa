@@ -20,6 +20,7 @@ const getCommand = (command, rootDir) => {
     const formattedCommand = command ? command.replace(/^\-/g, '') : command;
     const libsDir = path.resolve(rootDir, 'node_modules', 'ng2-webpack-balsa', 'libs');
     let commandFunction;
+    let commandName;
 
     switch (formattedCommand) {
         case 'component':
@@ -28,12 +29,20 @@ const getCommand = (command, rootDir) => {
             break;
         case 'initial':
         case 'i':
-            commandFunction = require(path.resolve(libsDir, 'initial'));
+            commandName = 'initial';
+            break;
+        case 'route':
+        case 'r':
+            commandName = 'route'
             break;
         case 'service':
         case 's':
-            commandFunction = require(path.resolve(libsDir, 'service'));
+            commandName = 'service';
             break;
+    }
+
+    if (commandName) {
+        commandFunction = require(path.resolve(libsDir, commandName));
     }
 
     return commandFunction;
