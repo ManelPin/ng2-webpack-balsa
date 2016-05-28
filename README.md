@@ -34,6 +34,7 @@ Again, if you follow the above guidance, all commands start with `npm run balsa`
 
 - [Component](#component)
 - [Initial](#initial)
+- [Route](#route)
 - [Service](#service)
 
 All names & selectors need to be in dash format which is all lowercase with words seprated by hyphens (-).
