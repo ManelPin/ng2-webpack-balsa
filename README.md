@@ -39,7 +39,8 @@ Again, if you follow the above guidance, all commands start with `npm run balsa`
 
 All names & selectors need to be in dash format which is all lowercase with words seprated by hyphens (-).
 
-### Component <a name="component"></a>
+<a name="component"></a>
+### Component
 
 #### Prompts
 The component command will scaffold out a new component, including unit test file. You will be prompted with the
