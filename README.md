@@ -72,7 +72,8 @@ And, depending on prompt answers:
 - `src/app/components/[selector]/[selector].component.scss` (if inline template is `n` or `no`)
 - `src/app/components/[selector]/[selector].component.html` (if inline template is `n` or `no`)
 
-### Initial <a name="initial"></a>
+<a name="initial"></a>
+### Initial
 
 #### Prompts
 Initializes the directory to a new Git project, sets up a basic README.md & package.json. The prompts are:
@@ -89,7 +90,8 @@ create:
 - `package.json`
 - `.git`
 
-### Route <a name="route"></a>
+<a name="route"></a>
+### Route
 
 #### Prompts
 
@@ -110,7 +112,8 @@ It will also modify the parent component to use routes. This adds
 `@angular/router` (run `npm i -S @angular/router` if you haven't already)
 - Creates the `@Routes` decorator and adds the new route (if necessary)
 
-### Service <a name="service"></a>
+<a name="service"></a>
+### Service
 
 #### Prompts
 Using the dash naming method, creates a service and its unit test file. Your will be prompted with a single question:
