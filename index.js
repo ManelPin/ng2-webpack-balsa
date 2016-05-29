@@ -10,7 +10,7 @@ const main = (cliArgs)  => {
 
     if (typeof command === 'function') {
         commandArguments.unshift(rootDir);
-        command(...commandArguments);
+        command.apply(null, commandArguments);
     } else {
         askForType();
     }
@@ -30,6 +30,10 @@ const getCommand = (command, rootDir) => {
         case 'initial':
         case 'i':
             commandName = 'initial';
+            break;
+        case 'pipe':
+        case 'p':
+            commandName = 'pipe';
             break;
         case 'route':
         case 'r':
