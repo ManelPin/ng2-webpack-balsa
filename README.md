@@ -39,6 +39,7 @@ Again, if you follow the above guidance, all commands start with `npm run balsa`
 
 - [Component](#component)
 - [Initial](#initial)
+- [Pipe](#pipe)
 - [Route](#route)
 - [Service](#service)
 
@@ -46,6 +47,13 @@ All names & selectors need to be in dash format which is all lowercase with word
 
 <a name="component"></a>
 ### Component
+
+#### Commands
+
+```
+npm run balsa component
+npm run balsa component-name
+```
 
 #### Prompts
 The component command will scaffold out a new component, including unit test file. You will be prompted with the
@@ -70,15 +78,78 @@ To add no hooks, just enter nothing. Valid options are as follows (and unknown v
 This will create, at least, the following:
 
 - `src/app/components/[selector]/[selector].component.ts`
-- `src/test/components/[selector].spec.ts`
+- `src/test/components/[selector].component.spec.ts`
 
 And, depending on prompt answers:
 
 - `src/app/components/[selector]/[selector].component.scss` (if inline template is `n` or `no`)
 - `src/app/components/[selector]/[selector].component.html` (if inline template is `n` or `no`)
 
+<a name="component-example"></a>
+#### Example
+```
+> npm run balsa component
+Selector: pizza-party
+Use inline styles (y/n)? n
+Use an inline template (y/n)? y
+Lifecycle hooks (comma-separated; i.e., "OnInit, OnDestroy"): init,destroy,docheck
+```
+
+`src/app/components/pizza-party/pizza-party.component.ts`
+```typescript
+import {
+    Component, OnInit, OnDestroy, DoCheck
+} from '@angular/core';
+
+@Component({
+    selector: 'pizza-party',
+    styles: [require('./pizza-party.component.scss')],
+    template: ``
+})
+export class PizzaPartyComponent implements OnInit, OnDestroy, DoCheck {
+	ngOnInit() {
+	}
+	ngOnDestroy() {
+	}
+	ngDoCheck() {
+	}
+}
+```
+
+`src/test/specs/components/pizza-party.component.spec.ts`
+```typescript
+import {
+    beforeEach,
+    describe,
+    expect,
+    it
+} from '@angular/core/testing';
+import { ComponentFixture } from '@angular/compiler/testing';
+
+import * as testUtils from '../../test-utils';
+
+import { PizzaPartyComponent } from '../../../app/components/pizza-party/pizza-party.component.ts';
+
+describe('Component: PizzaPartyComponent', () => {
+    let component: PizzaPartyComponent;
+    let fixture: ComponentFixture<PizzaPartyComponent>;
+
+    beforeEach(testUtils.createComponent(PizzaPartyComponent, (componentInstance: PizzaPartyComponent, componentFixture: ComponentFixture<PizzaPartyComponent>) => {
+        component = componentInstance;
+        fixture = componentFixture;
+    }));
+});
+```
+
+There will also be an empty `src/app/components/pizza-party.component.scss` file.
+
 <a name="initial"></a>
 ### Initial
+
+#### Commands
+```
+npm run balsa initial
+```
 
 #### Prompts
 Initializes the directory to a new Git project, sets up a basic README.md & package.json. The prompts are:
@@ -95,8 +166,96 @@ create:
 - `package.json`
 - `.git`
 
+#### Example
+```
+> npm run balsa initial
+README title: A Food Story
+package.json name: food-story
+Repository URL: https://github.com/gonzofish/food-story
+```
+
+`package.json` (truncated)
+```json
+{
+  "name": "food-story",
+  "version": "0.0.0",
+  ...
+  "repository": {
+      "url": "https://github.com/gonzofish/food-story"
+  }
+}
+```
+
+`README.md`
+```markdown
+# A Food Story
+```
+
+And a new `.git` directory will be created.
+
+<a name="pipe"></a>
+### Pipe
+
+#### Commands
+
+```
+npm run balsa pipe
+npm run balsa pipe my-pipe
+```
+
+#### Prompts
+
+- `Pipe name (in dash-case):` - only asked if it is not provided
+- `Input type (type:fileLocation, blank is `any`):` - provide the input type and, if necessary, the location of the interface
+detailing that type. Entering blank sets the type to `any`.
+- `Output type(type:fileLocation, blank is `any`):` - provide the output type and, if necessary, the location of the interface
+detailing that type. Entering blank sets the type to `any`.
+- `Additional arguments (argument:type:fileLocation, comma-separated):` - provide a comma-separated list of additional arguments
+to the pipe.
+
+#### Output
+This will produce:
+
+- `src/app/pipes/[pipe name].pipe.ts`
+- `src/test/specs/pipes/[pipe name].pipe.spec.ts`
+
+#### Example
+```
+> npm run balsa pipe first-time
+Input type (type:fileLocation, blank is `any`): MyType:types/my
+Output type(type:fileLocation, blank is `any`): YourType:types/your
+Additional arguments (argument:type:fileLocation, comma-separated): arg1:Type:types/my,arg2:string,arg3:AnotherType:from/somewhere,arg4:FinalType:types/my
+```
+
+`src/app/pipes/first-time.pipe.ts`
+```typescript
+import { Pipe, PipeTransform } from '@angular/core';
+
+import { MyType,Type,FinalType } from '../types/my'
+import { YourType } from '../types/your'
+import { AnotherType } from '../from/somewhere'
+
+@Pipe({ name: 'firstTime' })
+export class FirstTimePipe implements PipeTransform {
+    transform(value: MyType, arg1: Type, arg2: string, arg3: AnotherType, arg4: FinalType): YourType {
+    }
+}
+```
+`src/test/specs/pipes/first-time.pipe.spec.ts`
+```typescript
+Input type (type:fileLocation, blank is `any`): MyType:types/my
+Output type(type:fileLocation, blank is `any`): YourType:types/your
+Additional arguments (argument:type:fileLocation, comma-separated): arg1:Type:types/my,arg2:string,arg3:AnotherType:from/somewhere,arg4:FinalType:types/my
+```
+
 <a name="route"></a>
 ### Route
+
+#### Commands
+```
+npm run balsa route
+npm run balsa route child-component-name
+```
 
 #### Prompts
 
@@ -117,8 +276,61 @@ It will also modify the parent component to use routes. This adds
 `@angular/router` (run `npm i -S @angular/router` if you haven't already)
 - Creates the `@Routes` decorator and adds the new route (if necessary)
 
+#### Example
+
+Currently `src/app/components/app/app.component.ts` looks like:
+
+```typescript
+import {
+    Component
+} from '@angular/core';
+
+@Component({
+    selector: 'app',
+    template: require('./app.component.html')
+})
+export class AppComponent {
+}
+```
+
+```
+> npm run balsa route burrito-bungalo
+Use inline styles (y/n)? y
+Use an inline template (y/n)? y
+Lifecycle hooks (comma-separated; i.e., "OnInit, OnDestroy"):
+What is the parent component? app
+```
+
+All files will be created similar to the [component command example](#component-example).
+
+`src/app/components/app/app.component.ts`
+```typescript
+import {
+    Component
+} from '@angular/core';
+import { Routes, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router';
+import { BurritoBungalowComponent } from '../burrito-bungalow/burrito-bungalow.component';
+
+@Component({
+    selector: 'app',
+    template: require('./app.component.html'),
+    directives: [ROUTER_DIRECTIVES],
+    providers: [ROUTER_PROVIDERS]
+})
+@Routes([
+    { component: BurritoBungalowComponent, path: '/burrito-bungalow' }
+])
+export class AppComponent {}
+```
+
 <a name="service"></a>
 ### Service
+
+#### Commands
+```
+npm run balsa service
+npm run balsa service service-name
+```
 
 #### Prompts
 Using the dash naming method, creates a service and its unit test file. Your will be prompted with a single question:
@@ -130,3 +342,39 @@ This will produce the following:
 
 - `src/app/services/[service name].service.ts`
 - `src/test/services/[service name].service.spec.ts`
+
+#### Example
+```
+> npm run balsa service
+Service name: order-handling
+```
+
+`src/app/services/order-handling.service.ts`
+```typescript
+import { Injectable } from '@angular/core';
+
+@Injectable()
+export class OrderHandlingService {
+    constructor() {}
+}
+```
+`src/test/specs/services/order-handling.service.spec.ts`
+```typescript
+import {
+    beforeEachProviders,
+    describe,
+    expect,
+    inject,
+    it
+} from '@angular/core/testing';
+
+import { OrderHandlingService } from '../../../app/services/order-handling.service.ts';
+
+describe('Service: OrderHandling', () =>{
+    beforeEachProviders(() => [OrderHandlingService]);
+
+    it('should', inject([OrderHandlingService], (service: OrderHandlingService) => {
+
+    }));
+});
+```
