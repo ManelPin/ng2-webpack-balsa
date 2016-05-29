@@ -7,7 +7,8 @@ This project provides a setup for [Angular 2](https://angular.io) & [Webpack](ht
 
 ## Requirements
 
-As of now, you'll need [Node 5.0+](https://nodejs.org/en/download/releases/) & NPM to get this all working.
+As of now, you'll need [Node 5.0+](https://nodejs.org/en/download/releases/) & NPM to get this all working. But let me suggest
+[nvm](https://github.com/creationix/nvm) or [n](https://github.com/tj/n) to manage multiple versions of Node & NPM.
 
 ## How do I use it?
 
