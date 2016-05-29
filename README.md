@@ -5,6 +5,10 @@
 The [Balsa scaffolding tool](https://github.com/gonzofish/balsa) provides a lightweight framework for scaffolding projects.
 This project provides a setup for [Angular 2](https://angular.io) & [Webpack](https://webpack.github.io/) using Balsa.
 
+## Requirements
+
+As of now, you'll need [Node 5.0+](https://nodejs.org/en/download/releases/) & NPM to get this all working.
+
 ## How do I use it?
 
 To add it to your project, just run:
